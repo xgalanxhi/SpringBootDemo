@@ -2,12 +2,26 @@ apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: springboot-build
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 jobs:
   build:
     steps:
       - name: Checkout code
         uses: cloudbees-io/checkout@v1
+      - name: Set up JDK 17
+        uses: cloudbees-io/setup-java@v1
+        with:
+          java-version: "17"
+          distribution: temurin
+      - name: Grant execute permission for gradlew
+        uses: cloudbees-io/step-runner@v1
+        with:
+          run: chmod +x ./gradlew
+      - name: Build with Gradle
+        uses: cloudbees-io/step-runner@v1
+        with:
+          run: ./gradlew build
+      - name: Run tests
+        uses: cloudbees-io/step-runner@v1
+        with:
+          run: ./gradlew test
