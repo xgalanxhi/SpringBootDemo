@@ -8,17 +8,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: cloudbees-io/checkout@v1
-
       - name: Build, test, and publish reports/artifacts
+        kind: build
         uses: docker://gradle:7.6.2-jdk17
         run: |
           chmod +x ./gradlew
-          ./gradlew clean build test
-
-          # Upload JUnit test reports
-          mkdir -p /cloudbees/reports/junit
-          cp build/test-results/test/*.xml /cloudbees/reports/junit/
-
-          # Upload JAR artifacts
-          mkdir -p /cloudbees/artifacts
-          cp build/libs/*.jar /cloudbees/artifacts/
+          ./gradlew clean build
+      - name: Test
+        kind: test
+        uses: docker://gradle:7.6.2-jdk17
+        run: |
+          chmod +x ./gradlew
+          ./gradlew  test
