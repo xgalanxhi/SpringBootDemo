@@ -9,9 +9,18 @@ jobs:
       - name: Checkout code
         uses: cloudbees-io/checkout@v1
 
-      - name: Setup and build
+      - name: Setup, build, and test
         uses: docker://gradle:7.6.2-jdk17
         run: |
           chmod +x ./gradlew
-          ./gradlew build
-          ./gradlew test
+          ./gradlew clean build test
+
+      - name: Upload test report
+        uses: cloudbees-io/test-report@v1
+        with:
+          path: build/test-results/test/TEST-*.xml
+          
+      - name: Upload JAR artifact
+        uses: cloudbees-io/artifact@v1
+        with:
+          path: build/libs/*.jar
